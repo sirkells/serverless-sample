@@ -10,7 +10,7 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Build&Upload
+- stage: Build_Upload
   displayName: Build Lambda Zip Files
   jobs:
   - job: BuildJob
