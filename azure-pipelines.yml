@@ -56,14 +56,14 @@ stages:
   - job: UploadLambda
     pool:
       vmImage: 'ubuntu-latest'
-      continueOnError: false
+    continueOnError: false
     steps:
     - task: S3Upload@1
       inputs:
         awsCredentials: 'cicd_credential'
         regionName: 'eu-central-1'
         bucketName: 'sample-project-ka2-backend'
-        sourceFolder: '$(Pipeline.Workspace)/rest_api/a/'
+        sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
         globExpressions: '**'
         targetFolder: '$(Build.BuildId)'
         createBucket: true
