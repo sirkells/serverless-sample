@@ -6,14 +6,31 @@
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
+variables:
+  tag: '$(Build.BuildId)'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+- stage: Build&Upload
+  displayName: Build Lambda Zip Files
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - bash: echo Zipping lambda directory
+    - bash: ls -R $(System.DefaultWorkingDirectory)/backend
+    # - task: ArchiveFiles@2
+    #   inputs:
+    #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/backend/'
+    #     includeRootFolder: false
+    #     archiveType: 'zip'
+    #     archiveFile: 'rest-api.zip'
+    #     replaceExistingArchive: true
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    # - task: S3Upload@1
+    #   inputs:
+    #     awsCredentials: 'cicd_credential'
+    #     regionName: 'eu-central-1'
+    #     bucketName: 'sample-project-ka2-backend'
+    #     sourceFolder: '$(Build.ArtifactStagingDirectory)/rest-api.zip'
+    #     globExpressions: '**'
