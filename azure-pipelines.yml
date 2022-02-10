@@ -63,9 +63,10 @@ stages:
             inputs:
               awsCredentials: 'cicd_credential'
               regionName: 'eu-central-1'
-              bucketName: 'sample-project-ka2-backend/$(Build.BuildId)'
+              bucketName: 'sample-project-ka2-backend'
               sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
               globExpressions: '**'
+              targetFolder: '$(Build.BuildId)'
               createBucket: true
             displayName: 'upload Lambda function ZIP build to staging bucket'
           # - script: |
