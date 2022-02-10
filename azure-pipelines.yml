@@ -48,16 +48,29 @@ stages:
           targetPath: '$(Pipeline.Workspace)'
           artifact: 'rest_api'
           publishLocation: 'pipeline'
-      - task: S3Upload@1
-        inputs:
-          awsCredentials: 'cicd_credential'
-          regionName: 'eu-central-1'
-          bucketName: 'sample-project-ka2-backend'
-          sourceFolder: '$(Pipeline.Workspace)/rest_api/a/'
-          globExpressions: '**'
-          targetFolder: '$(Build.BuildId)'
-          createBucket: true
-        displayName: 'upload Lambda function ZIP build to staging bucket'
+      
+
+- stage: Upload Artifact to S3
+  dependsOn: Build
+  jobs:
+  - job: UploadLambda
+    pool:
+      vmImage: 'ubuntu-latest'
+      continueOnError: false
+    steps:
+    - task: S3Upload@1
+      inputs:
+        awsCredentials: 'cicd_credential'
+        regionName: 'eu-central-1'
+        bucketName: 'sample-project-ka2-backend'
+        sourceFolder: '$(Pipeline.Workspace)/rest_api/a/'
+        globExpressions: '**'
+        targetFolder: '$(Build.BuildId)'
+        createBucket: true
+      displayName: 'upload Lambda function ZIP build to staging bucket'
+
+
+
 
 # - stage: DevelopmentDeployment
 #   dependsOn: Build
