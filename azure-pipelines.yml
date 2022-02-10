@@ -18,7 +18,10 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - bash: echo Zipping lambda directory
-    - bash: ls -R $(System.DefaultWorkingDirectory)/backend
+    # - bash: cd $(System.DefaultWorkingDirectory)/backend &&
+    - script: ls
+      workingDirectory: $(System.DefaultWorkingDirectory)/backend
+      displayName: List contents of a folder
     # - task: ArchiveFiles@2
     #   inputs:
     #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/backend/'
