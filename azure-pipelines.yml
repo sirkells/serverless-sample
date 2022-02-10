@@ -19,7 +19,7 @@ trigger:
 
 
 stages:
-- stage: Build_and_Upload_to_S3
+- stage: BuildArtifact
   jobs:
   - job: BuildLambdaFunction
     pool:
@@ -50,8 +50,8 @@ stages:
           publishLocation: 'pipeline'
       
 
-- stage: Upload Artifact to S3
-  dependsOn: Build
+- stage: UploadArtifact
+  dependsOn: BuildArtifact
   jobs:
   - job: UploadLambda
     pool:
