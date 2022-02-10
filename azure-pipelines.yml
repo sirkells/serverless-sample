@@ -19,7 +19,7 @@ trigger:
 
 
 stages:
-- stage: Build
+- stage: Build_and_Upload_to_S3
   jobs:
   - job: BuildLambdaFunction
     pool:
@@ -48,34 +48,45 @@ stages:
           targetPath: '$(Pipeline.Workspace)'
           artifact: 'rest_api'
           publishLocation: 'pipeline'
-- stage: DevelopmentDeployment
-  dependsOn: Build
-  jobs:
-  - deployment: LambdaDevelopment
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'Development'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: S3Upload@1
-            inputs:
-              awsCredentials: 'cicd_credential'
-              regionName: 'eu-central-1'
-              bucketName: 'sample-project-ka2-backend'
-              sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
-              globExpressions: '**'
-              targetFolder: '$(Build.BuildId)'
-              createBucket: true
-            displayName: 'upload Lambda function ZIP build to staging bucket'
-          # - script: |
-          #     aws s3 cp $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
-          #     aws s3 cp $(Pipeline.Workspace)/rest_api/a/rest_api.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
-          #   displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
-          # - script: |
-          #     aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
-          #   displayName: 'updating CloudFormation stack'
+      - task: S3Upload@1
+        inputs:
+          awsCredentials: 'cicd_credential'
+          regionName: 'eu-central-1'
+          bucketName: 'sample-project-ka2-backend'
+          sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
+          globExpressions: '**'
+          targetFolder: '$(Build.BuildId)'
+          createBucket: true
+        displayName: 'upload Lambda function ZIP build to staging bucket'
+
+# - stage: DevelopmentDeployment
+#   dependsOn: Build
+#   jobs:
+#   - deployment: LambdaDevelopment
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     environment: 'Development'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           # - task: S3Upload@1
+#           #   inputs:
+#           #     awsCredentials: 'cicd_credential'
+#           #     regionName: 'eu-central-1'
+#           #     bucketName: 'sample-project-ka2-backend'
+#           #     sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
+#           #     globExpressions: '**'
+#           #     targetFolder: '$(Build.BuildId)'
+#           #     createBucket: true
+#           #   displayName: 'upload Lambda function ZIP build to staging bucket'
+#           # - script: |
+#           #     aws s3 cp $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
+#           #     aws s3 cp $(Pipeline.Workspace)/rest_api/a/rest_api.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
+#           #   displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
+#           - script: |
+#               aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+#             displayName: 'updating CloudFormation stack'
 
 # trigger:
 # - main
