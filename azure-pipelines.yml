@@ -53,7 +53,7 @@ stages:
           awsCredentials: 'cicd_credential'
           regionName: 'eu-central-1'
           bucketName: 'sample-project-ka2-backend'
-          sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
+          sourceFolder: '$(Pipeline.Workspace)/rest_api/a/'
           globExpressions: '**'
           targetFolder: '$(Build.BuildId)'
           createBucket: true
