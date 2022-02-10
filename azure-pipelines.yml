@@ -1,77 +1,79 @@
 trigger:
 - main
 
-pool:
-  vmImage: 'ubuntu-latest'
-
-stages:
-- stage: Build
-  jobs:
-  - job: FirstJob
-    steps:
-    - bash: echo $(PipelineLevelVariable)
-    - bash: echo $(Build.BuildNumber)
-    - bash: echo $(Build.BuildId)
-    - bash: echo $(Build.SourceBranchName)
-    - bash: ls -R $(Build.SourcesDirectory)
-    - bash: ls -R $(System.DefaultWorkingDirectory)
-    - bash: ls -R $(Build.ArtifactStagingDirectory)
-
+# pool:
+#   vmImage: 'ubuntu-latest'
 
 # stages:
 # - stage: Build
 #   jobs:
-#   - job: BuildLambdaFunction
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     continueOnError: false
+#   - job: FirstJob
 #     steps:
-#       - task: NodeTool@0
-#         inputs:
-#           versionSpec: '14.x'
-#         displayName: 'Install Node.js'
-#       - script: |
-#           npm install
-#           npm run build
-#         workingDirectory: $(System.DefaultWorkingDirectory)/backend
-#         displayName: 'NPM install, lint, and test'
-#       - task: ArchiveFiles@2
-#         inputs:
-#           rootFolderOrFile: '$(Build.SourcesDirectory)'
-#           includeRootFolder: true
-#           archiveType: 'zip'
-#           archiveFile: '$(Build.ArtifactStagingDirectory)/LambdaBuild.zip'
-#           replaceExistingArchive: true
-#           verbose: true
-#       - task: PublishPipelineArtifact@1
-#         inputs:
-#           targetPath: '$(Pipeline.Workspace)'
-#           artifact: 'LambdaBuild'
-#           publishLocation: 'pipeline'
-# - stage: DevelopmentDeployment
-#   dependsOn: Build
-#   jobs:
-#   - deployment: LambdaDevelopment
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     environment: 'Development'
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - script: |
-#               sudo apt-get install awscli
-#               aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
-#               aws configure set aws_secret_access_key $(AWS_SECRET_KEY_ID)
-#               aws configure set aws_default_region $(AWS_DEFAULT_REGION)
-#             displayName: 'install and configure AWS CLI'
-#           - script: |
-#               aws s3 cp $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
-#               aws s3 cp $(Pipeline.Workspace)/LambdaBuild/a/LambdaBuild.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
-#             displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
-#           - script: |
-#               aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/LambdaBuild/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
-#             displayName: 'updating CloudFormation stack'
+#     - bash: echo $(PipelineLevelVariable)
+#     - bash: echo $(Build.BuildNumber)
+#     - bash: echo $(Build.BuildId)
+#     - bash: echo $(Build.SourceBranchName)
+#     - bash: ls -R $(Build.SourcesDirectory)
+#     - bash: ls -R $(System.DefaultWorkingDirectory)
+#     - bash: ls -R $(Build.ArtifactStagingDirectory)
+
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildLambdaFunction
+    pool:
+      vmImage: 'ubuntu-latest'
+    continueOnError: false
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '14.x'
+        displayName: 'Install Node.js'
+      - script: |
+          npm install
+          npm run build
+        workingDirectory: $(System.DefaultWorkingDirectory)/backend
+        displayName: 'NPM install, lint, and test'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)/backend/build/'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/rest_api.zip'
+          replaceExistingArchive: true
+          verbose: true
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Pipeline.Workspace)'
+          artifact: 'rest_api'
+          publishLocation: 'pipeline'
+- stage: DevelopmentDeployment
+  dependsOn: Build
+  jobs:
+  - deployment: LambdaDevelopment
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'Development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: S3Upload@1
+            inputs:
+              awsCredentials: 'cicd_credential'
+              regionName: 'eu-central-1'
+              bucketName: 'sample-project-ka2-backend'
+              sourceFolder: '$(Pipeline.Workspace)/rest_api/a/rest_api.zip'
+              globExpressions: '**'
+            displayName: 'upload Lambda function ZIP build to staging bucket'
+          # - script: |
+          #     aws s3 cp $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
+          #     aws s3 cp $(Pipeline.Workspace)/rest_api/a/rest_api.zip s3://$(AWS_S3_STAGING_BUCKET_NAME)
+          #   displayName: 'upload CloudFormation template and Lambda function ZIP build to staging bucket'
+          # - script: |
+          #     aws cloudformation deploy --stack-name $(AWS_STACK_NAME_DEVELOPMENT) --template-file $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) --tags Environment=Development --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+          #   displayName: 'updating CloudFormation stack'
 
 # trigger:
 # - main
