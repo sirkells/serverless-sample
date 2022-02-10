@@ -50,10 +50,10 @@ stages:
           publishLocation: 'pipeline'
       
 
-- stage: UploadArtifact
+- stage: Deploy
   dependsOn: BuildArtifact
   jobs:
-  - deployment: LambdaDevelopment
+  - deployment: DevDeployment
     pool:
       vmImage: 'ubuntu-latest'
     environment: 'Development'
@@ -75,7 +75,7 @@ stages:
 
 
 # - stage: DevelopmentDeployment
-#   dependsOn: Build
+#   dependsOn: UploadArtifact
 #   jobs:
 #   - deployment: LambdaDevelopment
 #     pool:
