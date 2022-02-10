@@ -17,11 +17,14 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - bash: echo Zipping lambda directory
-    # - bash: cd $(System.DefaultWorkingDirectory)/backend &&
-    - script: ls
+    - bash: echo building js files
+    - script: npm run build
       workingDirectory: $(System.DefaultWorkingDirectory)/backend
       displayName: List contents of a folder
+    - bash: echo Zipping lambda
+    - script: zip -r rest_api.zip $(System.DefaultWorkingDirectory)/backend/build/
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      displayName: archive lambda
     # - task: ArchiveFiles@2
     #   inputs:
     #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/backend/'
