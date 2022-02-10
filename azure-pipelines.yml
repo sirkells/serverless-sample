@@ -27,9 +27,8 @@ stages:
     - script: rm -rf node_modules
       workingDirectory: $(System.DefaultWorkingDirectory)/backend
       displayName: remove node modules
-    - bash: echo Zipping lambda
-    - script: zip -r rest_api.zip $(System.DefaultWorkingDirectory)/backend/build/
-      workingDirectory: $(System.DefaultWorkingDirectory)
+    - script: zip -r rest_api.zip ./
+      workingDirectory: $(System.DefaultWorkingDirectory)/backend/build/
       displayName: archive lambda
     # - task: ArchiveFiles@2
     #   inputs:
