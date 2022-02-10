@@ -65,6 +65,8 @@ stages:
               regionName: 'eu-central-1'
               bucketName: 'sample-project-ka2-backend/$(Build.BuildId)'
               sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
+              globExpressions: '**'
+              createBucket: true
             displayName: 'upload Lambda function ZIP build to staging bucket'
           # - script: |
           #     aws s3 cp $(Pipeline.Workspace)/rest_api/s/$(AWS_CLOUDFORMATION_TEMPLATE_FILE_NAME) s3://$(AWS_S3_STAGING_BUCKET_NAME)
