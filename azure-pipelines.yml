@@ -85,6 +85,7 @@ stages:
           - task: TerraformCLI@0
             inputs:
               command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
               backendType: 'aws'
               allowTelemetryCollection: true
               backendServiceAws: 'cicd_credential'
