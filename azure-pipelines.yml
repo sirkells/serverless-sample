@@ -18,9 +18,15 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - bash: echo building js files
+    - script: npm install
+      workingDirectory: $(System.DefaultWorkingDirectory)/backend
+      displayName: install node packages
     - script: npm run build
       workingDirectory: $(System.DefaultWorkingDirectory)/backend
-      displayName: List contents of a folder
+      displayName: build js files
+    - script: rm -rf node_modules
+      workingDirectory: $(System.DefaultWorkingDirectory)/backend
+      displayName: remove node modules
     - bash: echo Zipping lambda
     - script: zip -r rest_api.zip $(System.DefaultWorkingDirectory)/backend/build/
       workingDirectory: $(System.DefaultWorkingDirectory)
