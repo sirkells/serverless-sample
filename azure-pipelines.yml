@@ -99,20 +99,18 @@ stages:
             displayName: 'Install Terraform latest'
           - task: AWSShellScript@1
             inputs:
-              awsCredentials: ${{ parameters.awsConnection }}
-              regionName: "eu-central-1"
-              scriptType: "inline"
+              awsCredentials: '${{ parameters.awsConnection }}'
+              regionName: 'eu-central-1'
+              scriptType: 'inline'
               inlineScript: |
-                terraform init \
+                terraform init infrastructure \
                     -backend-config="bucket=$(TF_BACKEND_S3_BUCKET)" \
                     -backend-config="region=$(TF_BACKEND_S3_REGION)" \
                     -backend-config="dynamodb_table=$(TF_BACKEND_S3_DYNAMODB_TABLE)"
-                terraform validate
-                terraform plan -detailed-exitcode
+                terraform validate infrastructure
+                terraform plan -detailed-exitcode infrastructure
                 echo $? > $(Pipeline.Workspace)/PLAN_CODE
                 echo "##vso[task.setvariable variable=PLAN_CODE]$(cat $(Pipeline.Workspace)/PLAN_CODE)"
-              disableAutoCwd: true
-              workingDirectory: "$(System.DefaultWorkingDirectory)/infrastructure"
               failOnStandardError: true
             env:
               AZDO_PERSONAL_ACCESS_TOKEN: $(AZDO_PERSONAL_ACCESS_TOKEN)
