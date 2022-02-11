@@ -1,25 +1,29 @@
 //State backend S3 bucket
-# resource "aws_s3_bucket" "backend_state" {
-#     bucket = "${var.project_name}-state"
+resource "aws_s3_bucket" "backend_state" {
+    bucket = "${var.project_name}-state"
 
-#     lifecycle {
-#         prevent_destroy = true
-#     }
+    lifecycle {
+        prevent_destroy = true
+    }
 
-#     versioning {
-#         enabled = true
-#     }
+}
 
-#     server_side_encryption_configuration {
-#         rule {
-#             apply_server_side_encryption_by_default {
-#                 sse_algorithm = "AES256"
-#             }
-#         }
-#     }
+resource "aws_s3_bucket_server_side_encryption_configuration" "backend-state" {
+  bucket = aws_s3_bucket.backend_state.id
 
-# }
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
+resource "aws_s3_bucket_versioning" "backend-state" {
+  bucket = aws_s3_bucket.backend_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 
 resource "aws_s3_bucket" "frontend" {
