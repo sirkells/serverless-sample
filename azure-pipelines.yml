@@ -102,7 +102,7 @@ stages:
               awsCredentials: '${{ parameters.awsConnection }}'
               regionName: 'eu-central-1'
               scriptType: 'inline'
-              workingDirectory: $(System.DefaultWorkingDirectory)
+              workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 echo $PWD
                 Get-ChildItem
