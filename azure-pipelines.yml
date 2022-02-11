@@ -114,8 +114,7 @@ stages:
               AWS_SECRET_ACCESS_KEY:  $(AWS_SECRET_ACCESS_KEY)
               AWS_DEFAULT_REGION:     $(TF_BACKEND_S3_REGION)
               AWS_SESSION_TOKEN:      $(AWS_SESSION_TOKEN)
-          - bash: ls $(System.DefaultWorkingDirectory)
-            workingDirectory: '$(System.DefaultWorkingDirectory)'
+            workingDirectory: '$(Pipeline.Workspace)/rest_api/s/infrastructure'
           # steps:
           # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
           #   displayName: 'Install Terraform latest'
