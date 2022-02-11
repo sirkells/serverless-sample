@@ -32,57 +32,57 @@ parameters:
     default: "cicd_credential"
 
 stages:
-# - stage: BuildArtifact
-#   jobs:
-#   - job: BuildLambdaFunction
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     continueOnError: false
-#     steps:
-#       - task: NodeTool@0
-#         inputs:
-#           versionSpec: '14.x'
-#         displayName: 'Install Node.js'
-#       - script: |
-#           npm install
-#           npm run build
-#         workingDirectory: $(System.DefaultWorkingDirectory)/backend
-#         displayName: 'NPM install, lint, and test'
-#       - task: ArchiveFiles@2
-#         inputs:
-#           rootFolderOrFile: '$(Build.SourcesDirectory)/backend/build/'
-#           includeRootFolder: false
-#           archiveType: 'zip'
-#           archiveFile: '$(Build.ArtifactStagingDirectory)/rest_api.zip'
-#           replaceExistingArchive: true
-#           verbose: true
-#       - task: PublishPipelineArtifact@1
-#         inputs:
-#           targetPath: '$(Pipeline.Workspace)'
-#           artifact: 'rest_api'
-#           publishLocation: 'pipeline'
+- stage: BuildArtifact
+  jobs:
+  - job: BuildLambdaFunction
+    pool:
+      vmImage: 'ubuntu-latest'
+    continueOnError: false
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '14.x'
+        displayName: 'Install Node.js'
+      - script: |
+          npm install
+          npm run build
+        workingDirectory: $(System.DefaultWorkingDirectory)/backend
+        displayName: 'NPM install, lint, and test'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)/backend/build/'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/rest_api.zip'
+          replaceExistingArchive: true
+          verbose: true
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Pipeline.Workspace)'
+          artifact: 'rest_api'
+          publishLocation: 'pipeline'
 
-# - stage: DeployApp
-#   dependsOn: BuildArtifact
-#   jobs:
-#   - deployment: DevDeployment
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     environment: 'Development'
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - task: S3Upload@1
-#             inputs:
-#               awsCredentials: ${{ parameters.awsConnection }}
-#               regionName: '$(TF_BACKEND_S3_REGION)'
-#               bucketName: '$(TF_BACKEND_S3_BUCKET)'
-#               sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
-#               globExpressions: '**'
-#               targetFolder: '$(Build.BuildId)'
-#               createBucket: true
-#             displayName: 'upload Lambda function ZIP build to staging bucket'    
+- stage: DeployApp
+  dependsOn: BuildArtifact
+  jobs:
+  - deployment: DevAppDeployment
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'Development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: S3Upload@1
+            inputs:
+              awsCredentials: ${{ parameters.awsConnection }}
+              regionName: '$(TF_BACKEND_S3_REGION)'
+              bucketName: '$(TF_BACKEND_S3_BUCKET)'
+              sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
+              globExpressions: '**'
+              targetFolder: '$(Build.BuildId)'
+              createBucket: true
+            displayName: 'upload Lambda function ZIP build to staging bucket'    
 # Load secrets from Key Vault
 
 # - stage: Build
@@ -93,9 +93,9 @@ stages:
 #     - bash: ls -R $(System.DefaultWorkingDirectory)
 #     - bash: ls -R $(Build.ArtifactStagingDirectory)
 - stage: DeployInfrastructure
-  #dependsOn: DeployApp
+  dependsOn: DeployApp
   jobs:
-  - deployment: DevDeployment
+  - deployment: DevInfraDeployment
     pool:
       vmImage: 'ubuntu-latest'
     environment: 'Development'
