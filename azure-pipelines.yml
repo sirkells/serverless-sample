@@ -83,7 +83,13 @@ stages:
 #               targetFolder: '$(Build.BuildId)'
 #               createBucket: true
 #             displayName: 'upload Lambda function ZIP build to staging bucket'    
-
+- stage: Build
+  jobs:
+  - job: FirstJob
+    steps:
+    - bash: ls -R $(Build.SourcesDirectory)
+    - bash: ls -R $(System.DefaultWorkingDirectory)
+    - bash: ls -R $(Build.ArtifactStagingDirectory)
 - stage: DeployInfrastructure
   #dependsOn: DeployApp
   jobs:
@@ -102,7 +108,6 @@ stages:
               awsCredentials: '${{ parameters.awsConnection }}'
               regionName: 'eu-central-1'
               scriptType: 'inline'
-              workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 echo $PWD
                 Get-ChildItem
@@ -115,6 +120,8 @@ stages:
                 terraform -chdir=${{ parameters.path }} plan -detailed-exitcode
                 echo $? > $(Pipeline.Workspace)/PLAN_CODE
                 echo "##vso[task.setvariable variable=PLAN_CODE]$(cat $(Pipeline.Workspace)/PLAN_CODE)"
+              disableAutoCwd: true
+              workingDirectory: '$(Build.SourcesDirectory)'
               failOnStandardError: true
             env:
               AZDO_PERSONAL_ACCESS_TOKEN: $(AZDO_PERSONAL_ACCESS_TOKEN)
