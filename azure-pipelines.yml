@@ -71,47 +71,47 @@ stages:
               createBucket: true
             displayName: 'upload Lambda function ZIP build to staging bucket'    
 
-- stage: DeployInfrastructure
-  dependsOn: DeployApp
-  jobs:
-  - deployment: DevDeployment
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'Development'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: TerraformCLI@0
-            inputs:
-              command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
-              backendType: 'aws'
-              allowTelemetryCollection: true
-              backendServiceAws: 'cicd_credential'
-              backendAwsRegion: 'eu-central-1'
-              backendAwsBucket: 'sample-project-ka2-state'
-              backendAwsKey: 'dev/backend-state'
-            displayName: 'Initialize Terraform'
-          - task: TerraformCLI@0
-            inputs:
-              command: 'fmt'
-              allowTelemetryCollection: true
-            displayName: 'Validate Terraform'
-          - task: TerraformCLI@0
-            inputs:
-              command: 'plan'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
-              allowTelemetryCollection: true
-              providerServiceAws: 'cicd_credential'
-              providerAwsRegion: 'eu-central-1'
-          - task: TerraformCLI@0
-            inputs:
-              command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
-              commandOptions: '-auto-approve -var deployment_number=$(Build.BuildId)'
-              allowTelemetryCollection: true
-              providerServiceAws: 'cicd_credential'
+# - stage: DeployInfrastructure
+#   dependsOn: DeployApp
+#   jobs:
+#   - deployment: DevDeployment
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     environment: 'Development'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: TerraformCLI@0
+#             inputs:
+#               command: 'init'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+#               backendType: 'aws'
+#               allowTelemetryCollection: true
+#               backendServiceAws: 'cicd_credential'
+#               backendAwsRegion: 'eu-central-1'
+#               backendAwsBucket: 'sample-project-ka2-state'
+#               backendAwsKey: 'dev/backend-state'
+#             displayName: 'Initialize Terraform'
+#           - task: TerraformCLI@0
+#             inputs:
+#               command: 'fmt'
+#               allowTelemetryCollection: true
+#             displayName: 'Validate Terraform'
+#           - task: TerraformCLI@0
+#             inputs:
+#               command: 'plan'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+#               allowTelemetryCollection: true
+#               providerServiceAws: 'cicd_credential'
+#               providerAwsRegion: 'eu-central-1'
+#           - task: TerraformCLI@0
+#             inputs:
+#               command: 'apply'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/infrastructure'
+#               commandOptions: '-auto-approve -var deployment_number=$(Build.BuildId)'
+#               allowTelemetryCollection: true
+#               providerServiceAws: 'cicd_credential'
 # - stage: DevelopmentDeployment
 #   dependsOn: UploadArtifact
 #   jobs:
