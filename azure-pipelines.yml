@@ -97,7 +97,7 @@ stages:
           steps:
           - task: TerraformInstaller@0
             inputs:
-              terraformVersion: 'latest'
+              terraformVersion: '1.**'
           - task: AWSShellScript@1
             inputs:
               awsCredentials: ${{ parameters.awsConnection }}
