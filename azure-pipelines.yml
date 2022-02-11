@@ -76,8 +76,8 @@ stages:
           - task: S3Upload@1
             inputs:
               awsCredentials: ${{ parameters.awsConnection }}
-              regionName: '$(TF_BACKEND_S3_REGION)'
-              bucketName: '$(TF_BACKEND_S3_BUCKET)'
+              regionName: 'eu-central-1'
+              bucketName: 'sample-project-ka2-backend'
               sourceFolder: '$(Pipeline.Workspace)/rest_api/a'
               globExpressions: '**'
               targetFolder: '$(Build.BuildId)'
@@ -116,6 +116,7 @@ stages:
               inlineScript: |
                 terraform -chdir=${{ parameters.path }} init \
                     -backend-config="bucket=$(TF_BACKEND_S3_BUCKET)" \
+                    -backend-config="key=$(TF_BACKEND_S3_BUCKET_KEY)" \
                     -backend-config="region=$(TF_BACKEND_S3_REGION)" \
                     -backend-config="dynamodb_table=$(TF_BACKEND_S3_DYNAMODB_TABLE)"
                 terraform -chdir=${{ parameters.path }} validate
