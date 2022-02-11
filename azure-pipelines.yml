@@ -85,7 +85,7 @@ stages:
 #             displayName: 'upload Lambda function ZIP build to staging bucket'    
 
 - stage: DeployInfrastructure
-  dependsOn: DeployApp
+  #dependsOn: DeployApp
   jobs:
   - deployment: DevDeployment
     pool:
